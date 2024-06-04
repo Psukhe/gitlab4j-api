@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.gitlab4j.api.models.Bridge;
@@ -901,8 +902,12 @@ public class PipelineApi extends AbstractApi implements Constants {
      * @throws GitLabApiException if any exception occurs during execution
      */
     public Pager<Bridge> getBridgesForPipeline(Object projectIdOrPath, long pipelineId, int itemsPerPage, JobScope scope) throws GitLabApiException {
-        return (new Pager<>(this, Bridge.class, itemsPerPage, getDefaultPerPageParam(),
-            "projects", getProjectIdOrPath(projectIdOrPath), "pipelines", pipelineId, "bridges", scope));
+        MultivaluedMap<String, String> formData = getDefaultPerPageParam();
+        if (scope != null) {
+            formData.add("scope", scope.toString());
+        }
+        return (new Pager<>(this, Bridge.class, itemsPerPage, formData,
+            "projects", getProjectIdOrPath(projectIdOrPath), "pipelines", pipelineId, "bridges"));
     }
 
     /**
